@@ -1,0 +1,134 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // Helper function to check if user is authenticated
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+    
+    // Helper function to check if user is an admin
+    // You'll need to set up a custom claim or admin collection
+    function isAdmin() {
+      return isAuthenticated() && 
+        (request.auth.token.email.matches('.*@harshitsengar\\.com') || 
+         request.auth.token.email == string(get(/databases/$(database)/documents/admins/config).data.adminEmail));
+    }
+    
+    // Projects collection - public read, temporary public write for testing
+    match /projects/{projectId} {
+      allow read: if true; // Public read access
+      allow create, update, delete: if true; // Temporarily allow all writes for testing
+      // IMPORTANT: Change this back to admin-only after testing!
+      
+      // Validate project data on write
+      function isValidProject() {
+        let requiredFields = ['title', 'description', 'category', 'technologies'];
+        let incomingData = request.resource.data;
+        
+        return incomingData.keys().hasAll(requiredFields) &&
+          incomingData.title is string && incomingData.title.size() > 0 &&
+          incomingData.description is string && incomingData.description.size() > 0 &&
+          incomingData.category is string &&
+          incomingData.technologies is list;
+      }
+      
+      // Apply validation on create/update
+      allow create, update: if isAdmin() && isValidProject();
+    }
+    
+    // About collection - public read, temporary public write for testing
+    match /about/{aboutId} {
+      allow read: if true; // Public read access
+      allow create, update, delete: if true; // Temporarily allow all writes for testing
+      // IMPORTANT: Change this back to admin-only after testing!
+      
+      // Validate about data on write
+      function isValidAbout() {
+        let requiredFields = ['name', 'title', 'bio', 'email', 'location'];
+        let incomingData = request.resource.data;
+        
+        return incomingData.keys().hasAll(requiredFields) &&
+          incomingData.name is string && incomingData.name.size() > 0 &&
+          incomingData.title is string && incomingData.title.size() > 0 &&
+          incomingData.bio is string &&
+          incomingData.email is string && incomingData.email.matches('^[^@]+@[^@]+\\.[^@]+$') &&
+          incomingData.location is string;
+      }
+      
+      // Apply validation on create/update
+      allow create, update: if isAdmin() && isValidAbout();
+    }
+    
+    // Skills collection - public read, temporary public write for testing
+    match /skills/{skillId} {
+      allow read: if true; // Public read access
+      allow create, update, delete: if true; // Temporarily allow all writes for testing
+      // IMPORTANT: Change this back to admin-only after testing!
+      
+      // Validate skill data on write
+      function isValidSkill() {
+        let requiredFields = ['name', 'category', 'proficiency'];
+        let incomingData = request.resource.data;
+        
+        return incomingData.keys().hasAll(requiredFields) &&
+          incomingData.name is string && incomingData.name.size() > 0 &&
+          incomingData.category is string && incomingData.category.size() > 0 &&
+          incomingData.proficiency is number && 
+          incomingData.proficiency >= 0 && incomingData.proficiency <= 100;
+      }
+      
+      // Apply validation on create/update
+      allow create, update: if isAdmin() && isValidSkill();
+    }
+    
+    // Contacts collection - temporarily allow public access for testing
+    match /contacts/{contactId} {
+      // Allow anyone to submit a contact message
+      allow create: if request.resource.data.keys().hasAll(['name', 'email', 'subject', 'message']) &&
+        request.resource.data.name is string && request.resource.data.name.size() > 0 &&
+        request.resource.data.email is string && request.resource.data.email.matches('^[^@]+@[^@]+\\.[^@]+$') &&
+        request.resource.data.subject is string && request.resource.data.subject.size() > 0 &&
+        request.resource.data.message is string && request.resource.data.message.size() > 0;
+      
+      // Temporarily allow anyone to read and delete messages for testing
+      allow read, delete: if true; // IMPORTANT: Change this back to admin-only after testing!
+      
+      // No one can update messages
+      allow update: if false;
+    }
+    
+    // Header collection - public read, admin-only write
+    match /headers/{headerId} {
+      allow read: if true; // Public read access
+      allow create, update, delete: if true; // Temporarily allow all writes for testing
+      // IMPORTANT: Change this back to admin-only after testing!
+      
+      // Validate header data on write
+      function isValidHeader() {
+        let requiredFields = ['title', 'description', 'totalProjects', 'experience'];
+        let incomingData = request.resource.data;
+        
+        return incomingData.keys().hasAll(requiredFields) &&
+          incomingData.title is string && incomingData.title.size() > 0 &&
+          incomingData.description is string &&
+          incomingData.totalProjects is number &&
+          incomingData.experience is number;
+      }
+      
+      // Apply validation on create/update
+      allow create, update: if isAdmin() && isValidHeader();
+    }
+    
+    // Admins collection for storing admin configuration
+    match /admins/config {
+      allow read: if true; // Temporarily allow all reads for testing
+      allow write: if true; // Temporarily allow all writes for testing
+      // IMPORTANT: Change this back to admin-only after testing!
+    }
+    
+    // Default deny all other access
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}
