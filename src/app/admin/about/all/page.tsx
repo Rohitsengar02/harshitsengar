@@ -13,7 +13,7 @@ export default function AllAboutAdmin() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [deleteConfirm, setDeleteConfirm] = useState<string | null>(null);
-  const router = useRouter();
+  // Router removed as it's unused
 
   useEffect(() => {
     fetchAboutEntries();

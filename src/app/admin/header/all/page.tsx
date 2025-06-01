@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 import { collection, getDocs, doc, deleteDoc } from "firebase/firestore";
 import { db } from "@/lib/firebase";
 import { Toast } from "@/components/Toast";
-import AdminLayout from "@/components/layout/AdminLayout";
+// AdminLayout import removed as it's not used
 import AdminFormHeading from "@/components/layout/AdminFormHeading";
 import {
   Table,

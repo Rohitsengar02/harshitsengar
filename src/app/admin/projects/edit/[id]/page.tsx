@@ -8,7 +8,11 @@ import { motion } from 'framer-motion';
 import Link from 'next/link';
 import { Project } from '@/types';
 
-export default function EditProject({ params }: { params: { id: string } }) {
+interface EditProjectParams {
+  params: { id: string };
+}
+
+export default function EditProject({ params }: EditProjectParams) {
   const { id } = params;
   const router = useRouter();
   const [loading, setLoading] = useState(true);

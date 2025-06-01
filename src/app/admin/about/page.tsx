@@ -8,6 +8,7 @@ import { AlertCircle, List, Plus, Trash2, Upload } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { About, Education, Experience } from '@/types';
 import Link from 'next/link';
+import Image from 'next/image';
 
 export default function AboutAdmin() {
   const searchParams = useSearchParams();
@@ -97,7 +98,7 @@ export default function AboutAdmin() {
     };
     
     fetchAboutData();
-  }, []);
+  }, [idFromQuery]); // Added idFromQuery to dependency array
   
   const handleBasicInfoChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
@@ -170,7 +171,7 @@ export default function AboutAdmin() {
     ]);
   };
   
-  const handleExperienceChange = (index: number, field: keyof Experience, value: any) => {
+  const handleExperienceChange = (index: number, field: keyof Experience, value: string | boolean | number) => {
     setExperience(prev => {
       const updated = [...prev];
       updated[index] = {
@@ -449,10 +450,13 @@ export default function AboutAdmin() {
                       className="flex flex-col items-center justify-center w-full h-64 border-2 border-dashed border-gray-300 dark:border-gray-700 rounded-lg cursor-pointer bg-gray-50 dark:bg-gray-900 hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
                     >
                       {imagePreview ? (
-                        <img 
+                        <Image 
                           src={imagePreview} 
                           alt="Profile preview" 
                           className="h-full object-contain"
+                          width={200}
+                          height={200}
+                          unoptimized
                         />
                       ) : (
                         <>

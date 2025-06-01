@@ -7,7 +7,11 @@ import { AlertCircle } from 'lucide-react';
 import Link from 'next/link';
 import { Skill } from '@/types';
 
-export default function EditSkill({ params }: { params: { id: string } }) {
+interface EditSkillParams {
+  params: { id: string };
+}
+
+export default function EditSkill({ params }: EditSkillParams) {
   const router = useRouter();
   const { id } = params;
   

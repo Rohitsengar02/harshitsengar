@@ -6,7 +6,7 @@ import { collection, addDoc, doc, getDoc, updateDoc } from "firebase/firestore";
 import { db, storage } from "@/lib/firebase";
 import { getDownloadURL, ref, uploadBytes } from "firebase/storage";
 import { Toast } from "@/components/Toast";
-import AdminLayout from "@/components/layout/AdminLayout";
+// AdminLayout import removed as it's not used
 import AdminFormHeading from "@/components/layout/AdminFormHeading";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Input } from "@/components/ui/input";

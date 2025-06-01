@@ -7,7 +7,7 @@ import { AlertCircle, Briefcase, Calendar, Download, GraduationCap, Mail, MapPin
 import { useEffect, useState } from 'react';
 import { About as AboutType, Education, Experience } from '@/types';
 import { getAbout } from '@/lib/firebase';
-import Link from 'next/link';
+// Import removed for unused Link
 
 export default function About() {
   const [about, setAbout] = useState<AboutType | null>(null);
